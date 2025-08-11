@@ -41,12 +41,13 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { ref } from 'vue'
 
 const email = ref('')
 const password = ref('')
 const router = useRouter()
+const route = useRoute()
 
 const emailRule = [
   (val) => !!val || 'Email is required',
@@ -59,12 +60,17 @@ const redirectToSignUp = () => {
   router.push('/SignUp')
 }
 
+function loginSuccess() {
+  localStorage.setItem('isAuthenticated', 'true')
+  const redirectPath = route.query.redirect || '/Dashboard'
+  router.replace(redirectPath)
+}
+
 const handleLogin = () => {
   if (email.value && password.value) {
     localStorage.setItem('auth', 'user-logged-in-tokken')
     localStorage.setItem('userEmail', email.value)
-    localStorage.setItem('isAuthenticated', 'true')
-    router.push('/dashboard')
+    loginSuccess()
   } else {
     console.log('fill in all the fields')
   }

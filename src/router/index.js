@@ -33,13 +33,28 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   })
 
-  Router.beforeEach((to, from, next) => {
-    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true'
+  const isAuthenticated = () => localStorage.getItem('isAuthenticated') === 'true'
 
-    if (to.path.startsWith('/dashboard') && !isAuthenticated) {
-      next('/login')
+  Router.beforeEach((to, from, next) => {
+    console.log('[beforeEach}', from.fullPath, 'to', to.fullPath)
+
+    if (to.meta.requiresAuth && !isAuthenticated()) {
+      console.warn('Access denied. Redirecting to /login...')
+      next({ path: '/login', query: { redirect: to.fullPath } })
+    } else if (
+      (to.path.toLowerCase() === '/login' || to.path.toLowerCase() === '/signup') &&
+      isAuthenticated()
+    ) {
+      next({ path: '/Dashboard' })
     } else {
       next()
+    }
+  })
+
+  Router.afterEach((to, from) => {
+    console.log('[afterEach]', from.fullPath, to, to.fullPath)
+    if (to.meta && to.meta.title) {
+      document.title = to.meta.title
     }
   })
 

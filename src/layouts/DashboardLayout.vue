@@ -43,9 +43,10 @@ const router = useRouter()
 const leftDraweOpen = ref(true)
 
 function logout() {
-  //clear auth token/ localStorage
-  localStorage.setItem('isAithenticated', 'false')
-  router.push('/login')
+  localStorage.removeItem('isAuthenticated')
+  localStorage.removeItem('auth')
+  localStorage.removeItem('userEmail')
+  router.replace('/login')
 }
 </script>
 
